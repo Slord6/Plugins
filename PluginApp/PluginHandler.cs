@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Web;
 
 namespace PluginApp
@@ -19,7 +18,11 @@ namespace PluginApp
                 if(IsRemotePath(pluginPath))
                 {
                     pluginPath = DownloadPlugin(pluginPath);
-                    if (pluginPath == null) new List<IPlugin>();
+                    if(pluginPath == null)
+                    {
+                        Console.WriteLine("Failed to download " + pluginPath);
+                        return new List<IPlugin>();
+                    }
                 }
 
                 Assembly pluginAssembly = LoadPluginAssembly(pluginPath);
@@ -60,6 +63,10 @@ namespace PluginApp
                 {
                     Console.WriteLine("Failed to download plugin from " + path);
                     Console.WriteLine(ex.Message);
+                    if(ex.InnerException != null)
+                    {
+                        Console.WriteLine(ex.InnerException.Message);
+                    }
                     return null;
                 }
             }
@@ -85,9 +92,10 @@ namespace PluginApp
             return orig;
         }
 
-        public static void RunPlugins(string[] args, IEnumerable<IPlugin> plugins)
+        public static void RunPlugins(ArgParser argParser, IEnumerable<IPlugin> plugins)
         {
-            if (args.Length == 0)
+            List<string> targetPlugins = argParser.GetValues(ArgStrings.TargetPlugins);
+            if (targetPlugins == null)
             {
                 Console.WriteLine("Loaded Plugins: ");
                 foreach (IPlugin command in plugins)
@@ -97,18 +105,18 @@ namespace PluginApp
             }
             else
             {
-                foreach (string commandName in args)
+                foreach (string pluginName in targetPlugins)
                 {
-                    Console.WriteLine($"-- {commandName} --");
+                    Console.WriteLine($"-- {pluginName} --");
 
-                    IPlugin command = plugins.FirstOrDefault(c => c.Name == commandName);
-                    if (command == null)
+                    IPlugin plugin = plugins.FirstOrDefault(c => c.Name == pluginName);
+                    if (plugin == null)
                     {
                         Console.WriteLine("No such command is known.");
                         return;
                     }
 
-                    command.CreateTask().RunSynchronously();
+                    plugin.CreateTask().RunSynchronously();
 
                     Console.WriteLine();
                 }
@@ -152,7 +160,7 @@ namespace PluginApp
             {
                 string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
                 throw new ApplicationException(
-                    $"Can't find any type which implements ICommand in {assembly} from {assembly.Location}.\n" +
+                    $"Can't find any type which implements IPlugin in {assembly} from {assembly.Location}.\n" +
                     $"Available types: {availableTypes}");
             }
         }

@@ -19,14 +19,10 @@ namespace PluginApp
                     Console.ReadLine();
                 }
 
-                string[] pluginPaths = new string[]
-                {
-                    // Paths to plugins to load.
-                    @"D:\samlo\Documents\Repos\Plugins\Plugins\bin\Debug\netstandard2.0\Plugins.dll"
-                };
+                List<string> pluginPaths = Directory.GetFiles(@".\Plugins\").ToList();
 
                 // Load plugins and invoke OnLoad for each
-                IEnumerable<IPlugin> plugins = LoadPlugins(pluginPaths);
+                IEnumerable<IPlugin> plugins = LoadPlugins(pluginPaths.ToArray());
 
                 RunPlugins(args, plugins);
 

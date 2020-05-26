@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\PluginBase\PluginBase.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <!-- This is what allows this to be loaded correctly as a plugin
+  The <Private>false</Private> element is important. This tells MSBuild
+  to not copy PluginBase.dll to the output directory for Plugin.
+  If the PluginBase.dll assembly is present in the output directory,
+  PluginLoadContext will find the assembly there and load it when it 
+  loads the Plugins.dll assembly. At this point, the individual plugin's
+  type will implement the IPlugin interface from the PluginBase.dll 
+  in the output directory of the Plugins project, not the IPlugin interface 
+  that is loaded into the default load context. Since the runtime sees these two 
+  types as different types from different assemblies, the PluginApp.Program.CreatePlugins 
+  method won't find the commands. As a result, the <Private>false</Private> metadata is
+  required for the reference to the assembly containing the plugin interfaces.
+    -->
+  <ItemGroup>
+      <ProjectReference Include="..\PluginBase\PluginBase.csproj">
+          <Private>false</Private>
+          <ExcludeAssets>runtime</ExcludeAssets>
+      </ProjectReference>
+  </ItemGroup>
+
+</Project>

@@ -14,6 +14,6 @@
 
 ## Loading remote plugins
 
-The PluginHandler will accept remote URIs for plugins. The URI must contain the name of the assembly as the last part of the path. eg. `https://example.com/PluginName.dll` or `https://example.com/SearchPlugin.dll?token=abc123`.
+The PluginHandler will accept remote URIs for plugins. The URI must contain the name of the assembly as the last part of the path. eg. `https://example.com/PluginName.dll` or `https://example.com/SearchPlugin.dll?token=abc123`or `https://example.com/QuestionPlugin?token=abc123`.
 
 Loosely based on the .NET Core plugin system described [here](https://docs.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)

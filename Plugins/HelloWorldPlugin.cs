@@ -10,11 +10,12 @@ namespace Plugins
 
         public string Description => "Simple example plugin";
 
-        public Task CreateTask()
+        public Task<PluginResultData> CreateTask()
         {
-            return new Task(() =>
+            return new Task<PluginResultData>(() =>
             {
                 Console.WriteLine("HelloWorld Task!");
+                return null;
             });
         }
 

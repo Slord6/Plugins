@@ -9,6 +9,6 @@ namespace PluginBase
 
         void OnLoad();
         void OnUnload();
-        Task CreateTask();
+        Task<PluginResultData> CreateTask();
     }
 }

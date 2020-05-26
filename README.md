@@ -15,7 +15,7 @@
 ### PluginApp Arguments
 `--help` for in-tool help
 `--pluginLocations` - List of locations to load plugins from, can be a filepath or URI - see "Loading remote plugins" below
-`--targetPlugins` - List of plugin names to run
+`--targetPlugins` - List of plugin names to run. If not provided all plugins are run.
 
 ## Loading remote plugins
 

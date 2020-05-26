@@ -97,29 +97,23 @@ namespace PluginApp
             List<string> targetPlugins = argParser.GetValues(ArgStrings.TargetPlugins);
             if (targetPlugins == null)
             {
-                Console.WriteLine("Loaded Plugins: ");
-                foreach (IPlugin command in plugins)
-                {
-                    Console.WriteLine($"{command.Name}\t - {command.Description}");
-                }
+                targetPlugins = plugins.Select(p => p.Name).ToList();
             }
-            else
+
+            foreach (string pluginName in targetPlugins)
             {
-                foreach (string pluginName in targetPlugins)
+                Console.WriteLine($"-- {pluginName} --");
+
+                IPlugin plugin = plugins.FirstOrDefault(c => c.Name == pluginName);
+                if (plugin == null)
                 {
-                    Console.WriteLine($"-- {pluginName} --");
-
-                    IPlugin plugin = plugins.FirstOrDefault(c => c.Name == pluginName);
-                    if (plugin == null)
-                    {
-                        Console.WriteLine("No such command is known.");
-                        return;
-                    }
-
-                    plugin.CreateTask().RunSynchronously();
-
-                    Console.WriteLine();
+                    Console.WriteLine("No such plugin is known.");
+                    return;
                 }
+
+                plugin.CreateTask().RunSynchronously();
+
+                Console.WriteLine();
             }
         }
 

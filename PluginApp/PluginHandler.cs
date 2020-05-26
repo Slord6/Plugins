@@ -13,18 +13,8 @@ namespace PluginApp
     {
         public static List<IPlugin> LoadPlugins(string[] pluginPaths)
         {
-            return pluginPaths.SelectMany(pluginPath =>
+            return ResolvePathsToLocal(pluginPaths).SelectMany(pluginPath =>
             {
-                if(IsRemotePath(pluginPath))
-                {
-                    pluginPath = DownloadPlugin(pluginPath);
-                    if(pluginPath == null)
-                    {
-                        Console.WriteLine("Failed to download " + pluginPath);
-                        return new List<IPlugin>();
-                    }
-                }
-
                 Assembly pluginAssembly = LoadPluginAssembly(pluginPath);
                 IEnumerable<IPlugin> pluginsFromAssembly = CreateAllPluginsInAssembly(pluginAssembly);
                 foreach (IPlugin plugin in pluginsFromAssembly)
@@ -33,6 +23,23 @@ namespace PluginApp
                 }
                 return pluginsFromAssembly;
             }).ToList();
+        }
+
+        private static IEnumerable<string> ResolvePathsToLocal(string[] pluginPaths)
+        {
+            return pluginPaths.ToList().Select<string, string>(pluginPath =>
+            {
+                if (IsRemotePath(pluginPath))
+                {
+                    pluginPath = DownloadPlugin(pluginPath);
+                    if (pluginPath == null)
+                    {
+                        Console.WriteLine("Failed to download " + pluginPath);
+                        return null;
+                    }
+                }
+                return pluginPath;
+            }).Where(x => x != null).Distinct();
         }
 
         private static bool IsRemotePath(string path)
@@ -54,6 +61,19 @@ namespace PluginApp
             {
                 string fileName = UrlToAssemblyFileName(path);
                 Console.WriteLine("Will save as " + fileName);
+                if (File.Exists(fileName))
+                {
+                    Console.WriteLine("Will try to delete existing file");
+                    try
+                    {
+                        File.Delete(fileName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Could not delete - " + ex.Message);
+                    }
+                }
+
                 try
                 {
                     client.DownloadFile(path, fileName);

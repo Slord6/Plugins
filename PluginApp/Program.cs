@@ -40,7 +40,8 @@ namespace PluginApp
                 List<string> locations = argParser.GetValues(ArgStrings.PluginLocations);
                 if (locations != null)
                 {
-                    pluginPaths.AddRange(locations);
+                    locations.AddRange(pluginPaths);
+                    pluginPaths = locations;
                 }
 
                 // Load plugins and invoke OnLoad for each

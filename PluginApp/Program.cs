@@ -19,7 +19,8 @@ namespace PluginApp
                     argParser = new ArgParser(args, new string[]
                     {
                         ArgStrings.PluginLocations,
-                        ArgStrings.Help
+                        ArgStrings.Help,
+                        ArgStrings.TargetPlugins
                     });
                 }
                 catch(ArgumentException ex)

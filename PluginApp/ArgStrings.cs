@@ -8,5 +8,6 @@ namespace PluginApp
         public static string Help = "help";
         public static string PluginLocations = "pluginLocations";
         public static string TargetPlugins = "targetPlugins";
+        public static string PluginLocationsFromFile = "pluginLocationsFile";
     }
 }

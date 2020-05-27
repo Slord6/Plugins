@@ -29,6 +29,18 @@ namespace PluginApp
             return null;
         }
 
+        public void AddValues(string key, List<string> values)
+        {
+            if(argValues.ContainsKey(key))
+            {
+                argValues[key].AddRange(values);
+            }
+            else
+            {
+                argValues.Add(key, values);
+            }
+        }
+
         /// <summary>
         /// Parse args in a dictionary of the argument (without '--') and a list of the provided values
         /// </summary>

@@ -28,6 +28,8 @@
 
 `--targetPlugins` - List of plugin names to run. If not provided all plugins are run.
 
+`--pluginLocationsFile` - List of files from which to load plugin paths. May be local or remote files. Each path should be on a new line.
+
 ## Loading remote plugins
 
 The PluginHandler will accept remote URIs for plugins. The URI must contain the name of the assembly as the last part of the path. eg. `https://example.com/PluginName.dll` or `https://example.com/SearchPlugin.dll?token=abc123`or `https://example.com/QuestionPlugin?token=abc123`.

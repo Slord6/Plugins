@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace PluginApp
@@ -29,7 +30,7 @@ namespace PluginApp
         {
             return pluginPaths.ToList().Select<string, string>(pluginPath =>
             {
-                if (IsRemotePath(pluginPath))
+                if (PathTools.IsRemotePath(pluginPath))
                 {
                     pluginPath = DownloadPlugin(pluginPath);
                     if (pluginPath == null)
@@ -42,24 +43,12 @@ namespace PluginApp
             }).Where(x => x != null).Distinct();
         }
 
-        private static bool IsRemotePath(string path)
-        {
-            try
-            {
-                Uri uri = new Uri(path);
-                return (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttps);
-            }
-            catch (Exception) {
-                return false;
-            }
-        }
-
         private static string DownloadPlugin(string path)
         {
             Console.WriteLine("Remote plugin - " + path);
             using (WebClient client = new WebClient())
             {
-                string fileName = UrlToAssemblyFileName(path);
+                string fileName = PathTools.UrlToFilename(path, "dll", @".\Plugins\");
                 Console.WriteLine("Will save as " + fileName);
                 if (File.Exists(fileName))
                 {
@@ -92,26 +81,6 @@ namespace PluginApp
             }
         }
 
-        private static string UrlToAssemblyFileName(string url)
-        {
-            string fileName = HttpUtility.UrlDecode(url)
-                .Split("/", StringSplitOptions.RemoveEmptyEntries).Last()
-                .Split(@"\", StringSplitOptions.RemoveEmptyEntries).Last()
-                .Split("?", StringSplitOptions.RemoveEmptyEntries).First()
-                .Split(".dll", StringSplitOptions.RemoveEmptyEntries).First()
-                +".dll";
-            return @".\Plugins\" + ToValidFilename(fileName);
-        }
-
-        private static string ToValidFilename(string orig)
-        {
-            foreach (char c in Path.GetInvalidFileNameChars())
-            {
-                orig = orig.Replace(c, '_');
-            }
-            return orig;
-        }
-
         public static void RunPlugins(ArgParser argParser, IEnumerable<IPlugin> plugins)
         {
             List<string> targetPlugins = argParser.GetValues(ArgStrings.TargetPlugins);
@@ -131,9 +100,24 @@ namespace PluginApp
                     return;
                 }
 
-                plugin.CreateTask().RunSynchronously();
+                Console.WriteLine("Running...");
+                Task<PluginResultData> task = plugin.CreateTask();
+                task.RunSynchronously();
+                if (!task.IsCompletedSuccessfully)
+                {
+                    Console.WriteLine("Plugin failed");
 
-                Console.WriteLine();
+                    Exception ex = task.Exception;
+                    while (ex != null)
+                    {
+                        Console.WriteLine(ex.Message);
+                        ex = ex.InnerException;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Plugin complete");
+                }
             }
         }
 

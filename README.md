@@ -4,6 +4,15 @@
 ## Write a plugin
 
 - For a new project, add a reference to the `PluginBase` project
+- Ensure project XML includes
+```XML
+<ItemGroup>
+      <ProjectReference Include="path\to\PluginBase.csproj">
+          <Private>false</Private>
+          <ExcludeAssets>runtime</ExcludeAssets>
+      </ProjectReference>
+  </ItemGroup>
+```
 - Create a new class (or classes) which implements `IPlugin`
 
 ### Order of execution
@@ -14,7 +23,9 @@
 
 ### PluginApp Arguments
 `--help` for in-tool help
+
 `--pluginLocations` - List of locations to load plugins from, can be a filepath or URI - see "Loading remote plugins" below
+
 `--targetPlugins` - List of plugin names to run. If not provided all plugins are run.
 
 ## Loading remote plugins
